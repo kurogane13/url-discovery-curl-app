@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Execute curl Command</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212; /* Dark background */
+            color: #e0e0e0; /* Light text color */
+        }
+
+        h1, h3 {
+            color: cyan; /* Cyan titles */
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .container {
+            width: 90%;
+            margin: 0 auto;
+            background-color: #1e1e1e; /* Dark container background */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        input[type="text"], input[type="url"] {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #000; /* Black input background */
+            color: #ffffff; /* White text in input */
+            display: block; /* Ensure it's block-level */
+            margin-left: auto; /* Centering */
+            margin-right: auto;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-size: 16px; /* Default font size */
+            margin: 10px 5px; /* Margin for spacing */
+        }
+
+        .discover-btn {
+            background-color: orange; /* Orange background for discover button */
+            color: black; /* Black text for discover button */
+        }
+
+        .stop-btn {
+            background-color: red; /* Red background for stop button */
+            color: white; /* White text for stop button */
+        }
+
+        .execute-btn {
+            background-color: green; /* Green background for execute button */
+            color: white; /* White text for execute button */
+            display: block; /* Block-level button */
+            margin-left: auto; /* Centering */
+            margin-right: auto;
+        }
+
+        .btn:hover, .execute-btn:hover {
+            background-color: black; /* Black background on hover */
+            color: white; /* White text on hover */
+            transform: scale(1.05); /* Increase size on hover */
+        }
+
+        .terminal-container {
+            display: flex; /* Align terminals side by side */
+            justify-content: space-between; /* Space between terminals */
+            margin-top: 20px; /* Space above terminals */
+        }
+
+        .terminal {
+            background-color: #000;
+            color: #ffffff;
+            padding: 20px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            border-radius: 5px;
+            height: 480px;
+            overflow-y: auto;
+            width: 48%; /* Each terminal takes up half of the container */
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            text-align: center; /* Center the label */
+            margin-bottom: 5px; /* Space between label and input */
+            color: #ffffff; /* White text for labels */
+        }
+    </style>
+    <script>
+        // Function to fetch the log content every 2 seconds
+        function fetchLogContent() {
+            fetch('/log')
+                .then(response => response.json())
+                .then(data => {
+                    const terminal = document.getElementById('terminal-output');
+                    terminal.innerHTML = data.content.join('<br>');
+                })
+                .catch(error => console.error('Error fetching log content:', error));
+        }
+
+        // Set interval to fetch log content every 2 seconds
+        let logFetchInterval = setInterval(fetchLogContent, 2000);
+
+        function stopDiscovery() {
+            fetch('/stop-discovery', { method: 'POST' })
+                .then(() => {
+                    clearInterval(logFetchInterval);
+                    alert('Discovery process has been stopped.');
+                })
+                .catch(error => console.error('Error stopping discovery:', error));
+        }
+    </script>
+</head>
+<body>
+    <h1>URLS Discovery & Curl testing APP</h1>
+    <div class="container">
+        <!-- URL Discovery Form -->
+        <form action="/discover" method="POST">
+            <label for="url">Type a URL to Discover child or subdomains:</label>
+            <input type="url" id="url" name="url" placeholder="https://example.com" required>
+            <div style="display: flex; justify-content: center; align-items: center;">
+                <button type="submit" class="btn discover-btn">Discover</button>
+                <button type="button" class="btn stop-btn" onclick="stopDiscovery()">Stop Discovery</button>
+            </div>
+        </form>
+
+        <!-- Execute curl form -->
+        <form method="POST">
+            <label for="url">Provide a URL to check its status with curl:</label>
+            <input type="text" id="url" name="url" placeholder="https://example.com" required>
+            <button type="submit" class="btn execute-btn">Execute curl</button>
+        </form>
+
+        <!-- Terminal Output -->
+        <div class="terminal-container">
+            <div class="terminal" id="terminal-output">
+                <h3>Discovery Log Output</h3>
+                <p>Output will appear here...</p>
+            </div>
+
+            {% if result %}
+            <div class="terminal">
+                <pre>{{ result }}</pre>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
