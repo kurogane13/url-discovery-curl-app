@@ -25,7 +25,7 @@ A web application designed to discover child or subdomains from a given URL and 
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/url_discovery_curl_app.git
+   git clone https://github.com/kurogane13/url_discovery_curl_app.git
    cd url_discovery_curl_app
 
 2. **Create and activate a python venv:**
